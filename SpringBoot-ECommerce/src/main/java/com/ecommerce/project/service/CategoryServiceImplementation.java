@@ -62,13 +62,20 @@ public class CategoryServiceImplementation implements CategoryService{
 //         categories.remove(category);
 //         return "Category with category id "+ categoryId + " has been deleted Successfully !";
 
-           List<Category> categories = categoryRepository.findAll();
-           Category category = categories.stream()
-                   .filter(c -> c.getCategoryId().equals(categoryId))
-                   .findFirst()
-                   .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Resource Not Found"));
-           categoryRepository.delete(category);
-           return "Category with categoryId: " + categoryId + " deleted Successfully";
+           // Using userRepository
+//           List<Category> categories = categoryRepository.findAll();
+//           Category category = categories.stream()
+//                   .filter(c -> c.getCategoryId().equals(categoryId))
+//                   .findFirst()
+//                   .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Resource Not Found"));
+//           categoryRepository.delete(category);
+//           return "Category with categoryId: " + categoryId + " deleted Successfully";
+
+            // Doing Optimizations in the Code
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"User Not Found"));
+            categoryRepository.delete(category);
+            return "Category with categoryId: " + categoryId + " deleted successfully";
     }
 
 
@@ -85,6 +92,9 @@ public class CategoryServiceImplementation implements CategoryService{
 //        else{
 //         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource Not Found");
 //        }
+
+         // Using userRepository to update the data
+        /*
           List<Category> categories =   categoryRepository.findAll();
           Optional<Category> optionalCategory = categories.stream()
                   .filter((c)->c.getCategoryId().equals(categoryId))
@@ -98,5 +108,14 @@ public class CategoryServiceImplementation implements CategoryService{
           else{
               throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Category Not Available");
           }
+         */
+
+        // Optimizations in the Code
+        Optional<Category> savedCategoryOptional = categoryRepository.findById(categoryId);
+        Category savedCategory = savedCategoryOptional
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category Not Found!"));
+        savedCategory.setCategoryName(category.getCategoryName());
+        categoryRepository.save(savedCategory);
+        return savedCategory;
     }
 }
